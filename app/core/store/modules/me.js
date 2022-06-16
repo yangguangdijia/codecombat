@@ -102,6 +102,26 @@ export default {
 
     isSmokeTestUser (state) {
       return utils.isSmokeTestEmail(state.email)
+    },
+
+    hasSubscription (state) {
+      if (state.payPal && state.payPal.billingAgreementID) {
+        return true
+      }
+
+      if (state.stripe && (state.stripe.sponsorID || state.stripe.subscriptionID || state.stripe.free === true)) {
+        return true
+      }
+
+      if (state.stripe && typeof state.stripe.free === 'string') {
+        return new Date() < new Date(state.stripe.free)
+      }
+
+      return false
+    },
+
+    isPremium (state, getters) {
+      return getters.isAdmin || getters.hasSubscription || getters.isInGodMode
     }
   },
 
